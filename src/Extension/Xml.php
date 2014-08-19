@@ -5,8 +5,9 @@ namespace ApiBird\Extension;
 class Xml implements \ApiBird\ExtensionInterface
 {
 
-    public static $types = [
+    protected static $types = [
         'application/xml',
+        'text/xml'
     ];
 
     public function fromFormat($data)

@@ -5,7 +5,7 @@ namespace ApiBird\Extension;
 class Html implements \ApiBird\ExtensionInterface
 {
 
-    public static $types = [
+    protected static $types = [
         'text/html',
         'application/xhtml+xml',
     ];

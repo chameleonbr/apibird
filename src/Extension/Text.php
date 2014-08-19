@@ -5,7 +5,7 @@ namespace ApiBird\Extension;
 class Text implements \ApiBird\ExtensionInterface
 {
 
-    public static $types = [
+    protected static $types = [
         'plain/text'
     ];
 

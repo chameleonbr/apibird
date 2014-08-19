@@ -5,7 +5,7 @@ namespace ApiBird\Extension;
 class Json implements \ApiBird\ExtensionInterface
 {
 
-    public static $types = [
+    protected static $types = [
         'application/json',
         'text/javascript',
         'application/javascript',
