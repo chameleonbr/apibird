@@ -1,0 +1,18 @@
+{
+    "name": "chameleonbr/apibird",
+    "description": "API Bird. Better API specialization of Phalcon Micro Instance",
+    "authors": [
+        {
+            "name": "André Avila",
+            "email": "andre.alexandre.avila@gmail.com"
+        }
+    ],
+    "require": {
+        "openlss/lib-array2xml": "0.0.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiBird\\": "src/"
+        }
+    }
+}
