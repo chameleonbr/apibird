@@ -3,9 +3,9 @@ require 'vendor/autoload.php';
 
 $di = new \Phalcon\DI\FactoryDefault();
 $app = new \ApiBird\Service($di);
-$app->registerHandlers([
-    'json' => '\\ApiBird\\Handler\\Json',
-    'xml' => '\\ApiBird\\Handler\\Xml'
+$app->registerExtensions([
+    'json' => '\\ApiBird\\Extension\\Json',
+    'xml' => '\\ApiBird\\Extension\\Xml'
 ]);
 
 $app->get('/', function() use ($app) {
