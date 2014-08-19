@@ -1,15 +1,13 @@
 <?php
 
-namespace ApiBird\Handler;
+namespace ApiBird\Extension;
 
-class Json implements \ApiBird\HandlerInterface
+class Html implements \ApiBird\ExtensionInterface
 {
 
     public static $types = [
-        'application/json',
-        'text/javascript',
-        'application/javascript',
-        'application/ecmascript',
+        'text/html',
+        'application/xhtml+xml',
     ];
 
     public function fromFormat($data)

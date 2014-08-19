@@ -2,7 +2,7 @@
 
 namespace ApiBird;
 
-interface HandlerInterface
+interface ExtensionInterface
 {
     public function fromFormat($data);
 

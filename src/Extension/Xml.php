@@ -1,8 +1,8 @@
 <?php
 
-namespace ApiBird\Handler;
+namespace ApiBird\Extension;
 
-class Xml implements \ApiBird\HandlerInterface
+class Xml implements \ApiBird\ExtensionInterface
 {
 
     public static $types = [
