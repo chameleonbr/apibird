@@ -10,16 +10,16 @@ $app->registerExtensions([
 
 $app->get('/', function() use ($app) {
     $app->produces(['json', 'xml']);
-    $retorno = ['xpto' => 123];
-    return $retorno;
+    $return = ['xpto' => 123];
+    return $return;
 });
 
 
 $app->post('/', function() use ($app) {
     $app->consumes(['json', 'xml'])->produces(['json', 'xml']);
-    $val = $app->getData();
-    $retorno = $val;
-    return $retorno;
+    $val = $app->getBody();
+    $return = $val;
+    return $return;
 });
 
 try {
