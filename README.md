@@ -15,5 +15,6 @@ Now Working
 Roadmap
 ------
 
+* Return JSend error responses
 * Work with Route example $app->get('/',function(){})->consumes(['json'])->produces(['json']);
 * Possibility of work with objects

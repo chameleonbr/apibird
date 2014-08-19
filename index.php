@@ -12,7 +12,7 @@ $app->registerExtensions([
 ]);
 
 $app->get('/', function() use ($app) {
-    //produces or consumes calls to check if the client expects the extension
+    //produces or consumes calls to check if the client sends expected extension
     $app->produces(['json', 'xml']);
     $return = ['xpto' => 123];
     //array returned is converted to Accept header extension
@@ -21,7 +21,7 @@ $app->get('/', function() use ($app) {
 
 
 $app->post('/', function() use ($app) {
-    //produces or consumes calls to check if the client expects the extension
+    //produces or consumes calls to check if the client sends expected extension
     $app->consumes(['json', 'xml'])->produces(['json', 'xml']);
     $val = $app->getBody();
     $return = $val;
