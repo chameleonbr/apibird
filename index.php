@@ -8,7 +8,8 @@ $app = new \ApiBird\Service($di);
 //now register the extensions globally
 $app->registerExtensions([
     'json' => '\\ApiBird\\Extension\\Json',
-    'xml' => '\\ApiBird\\Extension\\Xml'
+    'xml' => '\\ApiBird\\Extension\\Xml',
+    'form' => '\\ApiBird\\Extension\\Form'
 ]);
 
 $app->get('/', function() use ($app) {

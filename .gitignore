@@ -2,3 +2,4 @@
 /nbproject/private/
 /vendor/
 /composer.lock
+tests/_output/*
