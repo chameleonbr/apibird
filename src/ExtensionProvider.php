@@ -45,7 +45,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     public function getRequestExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (empty($fileType)) {
+        if (empty($fileType) && !empty($this->defaultContentType)) {
             return $this->getDI()->get($this->base . $this->defaultContentType);
         } else {
             return $this->getExtension($fileType, $acceptedFileTypes);
@@ -54,7 +54,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     public function getResponseExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (empty($fileType)) {
+        if (empty($fileType) && !empty($this->defaultAccept)) {
             return $this->getDI()->get($this->base . $this->defaultAccept);
         } else {
             return $this->getExtension($fileType, $acceptedFileTypes);
@@ -82,8 +82,31 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     public function hasExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (!empty($fileType) &&
-                isset($this->extensions[$fileType]) &&
+        if (isset($this->extensions[$fileType]) &&
+                in_array($this->extensions[$fileType], $acceptedFileTypes)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function hasRequestExtension($fileType = '', $acceptedFileTypes = [])
+    {
+        $di = $this->getDI();
+        if ((empty($fileType) || $fileType == '*/*') && $di->has($this->base . $this->defaultContentType)) {
+            return true;
+        } elseif (isset($this->extensions[$fileType]) &&
+                in_array($this->extensions[$fileType], $acceptedFileTypes)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function hasResponseExtension($fileType = '', $acceptedFileTypes = [])
+    {
+        $di = $this->getDI();
+        if ((empty($fileType) || $fileType == '*/*') && $di->has($this->base . $this->defaultAccept)) {
+            return true;
+        } elseif (isset($this->extensions[$fileType]) &&
                 in_array($this->extensions[$fileType], $acceptedFileTypes)) {
             return true;
         }

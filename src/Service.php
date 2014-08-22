@@ -23,7 +23,7 @@ class Service extends \Phalcon\Mvc\Micro
     {
         $ext = $this->request->getHeader('CONTENT_TYPE');
         $di = $this->getDI();
-        if ($di['apibird']->hasExtension($ext, $types)) {
+        if ($di['apibird']->hasRequestExtension($ext, $types)) {
             return $this;
         }
         throw new \ApiBird\InvalidTypeException('Unsupported Media Type', 415, $this);
@@ -38,11 +38,12 @@ class Service extends \Phalcon\Mvc\Micro
     {
         $ext = $this->request->getBestAccept();
         $di = $this->getDI();
-        if ($di['apibird']->hasExtension($ext, $types)) {
+        
+        if ($di['apibird']->hasResponseExtension($ext, $types)) {
             $this->finish(function () {
                 $ext = $this->request->getBestAccept();
                 $this->response->setHeader('Content-Type', $ext);
-                $handler = $this->apibird->getExtension($ext);
+                $handler = $this->apibird->getResponseExtension($ext);
                 $this->response->setContent($handler->toFormat($this->getReturnedValue()));
                 return $this->response->sendHeaders()->send();
             });
