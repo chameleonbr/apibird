@@ -5,9 +5,9 @@ namespace ApiBird;
 class InvalidTypeException extends \Exception
 {
 
-    public function __construct($message, $app = null)
+    public function __construct($message, $code, $app = null)
     {
-        $app->getDI()->get('response')->setStatusCode(415, $message)->sendHeaders();
+        $app->getDI()->get('response')->setStatusCode($code, $message)->sendHeaders();
         parent::__construct($message);
     }
 

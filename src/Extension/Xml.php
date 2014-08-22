@@ -2,6 +2,8 @@
 
 namespace ApiBird\Extension;
 
+use \LSS\Array2XML;
+
 class Xml implements \ApiBird\ExtensionInterface
 {
 
@@ -19,7 +21,8 @@ class Xml implements \ApiBird\ExtensionInterface
 
     public function toFormat($data, $root = 'result')
     {
-        $xml = \LSS\Array2XML::createXML($root, $data);
+        Array2XML::init('1.0', 'UTF-8', false);
+        $xml = Array2XML::createXML($root, $data);
         return $xml->saveXML();
     }
 

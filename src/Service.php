@@ -6,9 +6,13 @@ class Service extends \Phalcon\Mvc\Micro
 {
 
     protected $base = 'apibird.';
-    protected $extensions = array();
-    protected $contentType = null;
-    protected $bestAccept = null;
+    
+    public function __construct($dependencyInjector = null)
+    {
+        $dependencyInjector->set('request', '\\ApiBird\\Request', true);
+        $dependencyInjector->set('response', '\\ApiBird\\Response', true);
+        parent::__construct($dependencyInjector);
+    }
 
     /**
      * Read the Header Content-Type and check if data can be consumed
@@ -17,13 +21,12 @@ class Service extends \Phalcon\Mvc\Micro
      */
     public function consumes($types)
     {
-        $this->contentType = $this->request->getHeader('CONTENT_TYPE');
-        if (!empty($this->contentType) &&
-                isset($this->extensions[$this->contentType]) &&
-                in_array($this->extensions[$this->contentType], $types)) {
+        $ext = $this->request->getHeader('CONTENT_TYPE');
+        $di = $this->getDI();
+        if ($di['apibird']->hasExtension($ext, $types)) {
             return $this;
         }
-        throw new \ApiBird\InvalidTypeException('Unsupported Media Type', $this);
+        throw new \ApiBird\InvalidTypeException('Unsupported Media Type', 415, $this);
     }
 
     /**
@@ -33,55 +36,19 @@ class Service extends \Phalcon\Mvc\Micro
      */
     public function produces($types)
     {
-        $this->bestAccept = $this->request->getBestAccept();
-        if (!empty($this->bestAccept) &&
-                isset($this->extensions[$this->bestAccept]) &&
-                in_array($this->extensions[$this->bestAccept], $types)) {
+        $ext = $this->request->getBestAccept();
+        $di = $this->getDI();
+        if ($di['apibird']->hasExtension($ext, $types)) {
+            $this->finish(function () {
+                $ext = $this->request->getBestAccept();
+                $this->response->setHeader('Content-Type', $ext);
+                $handler = $this->apibird->getExtension($ext);
+                $this->response->setContent($handler->toFormat($this->getReturnedValue()));
+                return $this->response->sendHeaders()->send();
+            });
             return $this;
         }
-        throw new \ApiBird\InvalidTypeException('Unsupported Media Type', $this);
-    }
-
-    /**
-     * Register Extensions 
-     * @param type $handlers
-     * @return \ApiBird\Service
-     */
-    public function registerExtensions($handlers)
-    {
-        $di = $this->getDI();
-        foreach ($handlers as $index => $handler) {
-            $types = $handler::getTypes();
-            $this->registerExtension($index, $types);
-            $di->set($this->base . $index, function() use ($handler) {
-                $instance = new $handler();
-                return $instance;
-            });
-        }
-        $accept = $this->request->getBestAccept();
-        $this->after(function () use ($accept, $di) {
-            $this->response->setHeader('Content-Type', $accept);
-            $handler = $this->getExtension($accept);
-            return $this->response->setContent($di[$this->base . $handler]->toFormat($this->getReturnedValue()));
-        });
-        $this->finish(function () {
-            return $this->response->sendHeaders()->send();
-        });
-        return $this;
-    }
-
-    /**
-     * Register Extension and file types 
-     * @param type $serviceName
-     * @param type $types
-     * @return \ApiBird\Service
-     */
-    public function registerExtension($serviceName, $types)
-    {
-        foreach ($types as $value) {
-            $this->extensions[$value] = $serviceName;
-        }
-        return $this;
+        throw new \ApiBird\InvalidTypeException('Unsupported Media Type', 415, $this);
     }
 
     /**
@@ -90,20 +57,7 @@ class Service extends \Phalcon\Mvc\Micro
      */
     public function getBody()
     {
-        $handler = $this->extensions[$this->contentType];
-        return $this->getDI()
-                        ->get($this->base . $handler)
-                        ->fromFormat($this->request->getRawBody());
-    }
-
-    /**
-     * Get extension handler
-     * @param string $handler
-     * @return \ApiBird\ExtensionInterface
-     */
-    public function getExtension($handler)
-    {
-        return $this->extensions[$handler];
+        return $this->request->getBody();
     }
 
 }
