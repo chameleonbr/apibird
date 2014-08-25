@@ -9,7 +9,7 @@ class Response extends \Phalcon\Http\Response
      * 
      * @param type $types
      */
-    public function sendApiResponse($app)
+    public function apiSend($app)
     {    
         $di = $this->getDI();
         $ext = $di['request']->getBestAccept();

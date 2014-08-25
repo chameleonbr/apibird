@@ -45,6 +45,12 @@ $app->post('/', function() use ($app) {
     return $return;
 });
 
+$app->post('/all', function() use ($app) {
+    //without consumes and/or produces, accept all registered types
+    $return = $app->request->getBody();
+    return $return;
+});
+
 try {
     $app->handle();
 } catch (\ApiBird\InvalidTypeException $e) {

@@ -14,7 +14,7 @@ class Service extends \Phalcon\Mvc\Micro
         parent::__construct($dependencyInjector);
         if ($autoFinish) {
             $this->finish(function () {
-                return $this->response->sendApiResponse($this);
+                return $this->response->apiSend($this);
             });
         }
     }
