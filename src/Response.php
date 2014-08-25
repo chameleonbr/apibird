@@ -9,13 +9,14 @@ class Response extends \Phalcon\Http\Response
      * 
      * @param type $types
      */
-    public function sendApiResponse($types = [])
-    {
+    public function sendApiResponse($app)
+    {    
         $di = $this->getDI();
-        $bestAccept = $di['request']->getBestAccept();
-        $extension = $di['apibird']->getResponseExtension($bestAccept, $types);
-        $this->setContent($extension->toFormat($this->getContent()));
-        parent::send();
+        $ext = $di['request']->getBestAccept();
+        $this->setHeader('Content-Type', $ext);
+        $handler = $di['apibird']->getResponseExtension($ext);
+        $this->setContent($handler->toFormat($app->getReturnedValue()));
+        return $this->sendHeaders()->send();
     }
 
 }

@@ -5,8 +5,15 @@ if (isset($_REQUEST['DEBUG_MODE']) && $_REQUEST['DEBUG_MODE'] > 0) {
     xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
 }
 
+//using Phalcon Loader
 
-require '../../vendor/autoload.php';
+$loader = new \Phalcon\Loader();
+
+$loader->registerNamespaces([
+    'ApiBird' => '../../src',
+    'LSS' => '../../vendor/openlss/lib-array2xml/LSS',
+]);
+$loader->register();
 
 // DI is necessary to Service Class
 $di = new \Phalcon\DI\FactoryDefault();
@@ -16,10 +23,10 @@ $di->set('apibird', function() {
     $api = new \ApiBird\ExtensionProvider();
     $api->registerExtensions([
         'json' => '\\ApiBird\\Extension\\Json',
-        'xml' => '\\ApiBird\\Extension\\Xml',
         'form' => '\\ApiBird\\Extension\\Form',
         'html' => '\\ApiBird\\Extension\\Html',
         'text' => '\\ApiBird\\Extension\\Text',
+        'xml' => '\\ApiBird\\Extension\\Xml',
     ]);
     $api->setDefaultProduces('json');
     $api->setDefaultConsumes('form');

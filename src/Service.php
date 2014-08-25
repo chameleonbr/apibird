@@ -6,12 +6,17 @@ class Service extends \Phalcon\Mvc\Micro
 {
 
     protected $base = 'apibird.';
-    
-    public function __construct($dependencyInjector = null)
+
+    public function __construct($dependencyInjector = null, $autoFinish = true)
     {
         $dependencyInjector->set('request', '\\ApiBird\\Request', true);
         $dependencyInjector->set('response', '\\ApiBird\\Response', true);
         parent::__construct($dependencyInjector);
+        if ($autoFinish) {
+            $this->finish(function () {
+                return $this->response->sendApiResponse($this);
+            });
+        }
     }
 
     /**
@@ -21,7 +26,7 @@ class Service extends \Phalcon\Mvc\Micro
      */
     public function consumes($types)
     {
-        $ext = $this->request->getHeader('CONTENT_TYPE');
+        $ext = $this->request->getContentType();
         $di = $this->getDI();
         if ($di['apibird']->hasRequestExtension($ext, $types)) {
             return $this;
@@ -38,15 +43,8 @@ class Service extends \Phalcon\Mvc\Micro
     {
         $ext = $this->request->getBestAccept();
         $di = $this->getDI();
-        
+
         if ($di['apibird']->hasResponseExtension($ext, $types)) {
-            $this->finish(function () {
-                $ext = $this->request->getBestAccept();
-                $this->response->setHeader('Content-Type', $ext);
-                $handler = $this->apibird->getResponseExtension($ext);
-                $this->response->setContent($handler->toFormat($this->getReturnedValue()));
-                return $this->response->sendHeaders()->send();
-            });
             return $this;
         }
         throw new \ApiBird\InvalidTypeException('Unsupported Media Type', 415, $this);

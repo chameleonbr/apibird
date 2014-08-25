@@ -7,8 +7,8 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     protected $base = 'apibird.';
     protected $extensions = array();
-    protected $defaultContentType = null;
-    protected $defaultAccept = null;
+    protected $defaultProduces = null;
+    protected $defaultConsumes = null;
 
     /**
      * Register Extensions 
@@ -24,7 +24,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
             $di->set($this->base . $index, function() use ($handler) {
                 $instance = new $handler();
                 return $instance;
-            });
+            },true);
         }
         return $this;
     }
@@ -45,8 +45,8 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     public function getRequestExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (empty($fileType) && !empty($this->defaultContentType)) {
-            return $this->getDI()->get($this->base . $this->defaultContentType);
+        if (empty($fileType) || $fileType == '*/*' && !empty($this->defaultConsumes)) {
+            return $this->getDI()->get($this->base . $this->defaultConsumes);
         } else {
             return $this->getExtension($fileType, $acceptedFileTypes);
         }
@@ -54,8 +54,8 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     public function getResponseExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (empty($fileType) && !empty($this->defaultAccept)) {
-            return $this->getDI()->get($this->base . $this->defaultAccept);
+        if (empty($fileType) || $fileType == '*/*' && !empty($this->defaultProduces)) {
+            return $this->getDI()->get($this->base . $this->defaultProduces);
         } else {
             return $this->getExtension($fileType, $acceptedFileTypes);
         }
@@ -68,9 +68,11 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
      * @return \ApiBird\ExtensionInterface
      * @throws \ApiBird\InvalidTypeException
      */
-    public function getExtension($fileType = '', $acceptedFileTypes = [])
+    public function getExtension($fileType = '', $acceptedFileTypes = [], $defaultType = '')
     {
-        if (isset($this->extensions[$fileType])) {
+        if (empty($fileType) || $fileType == '*/*' && !empty($defaultType)) {
+            return $this->getDI()->get($this->base . $defaultType);
+        } else if (!empty($fileType) && isset($this->extensions[$fileType])) {
             if (!empty($acceptedFileTypes) && in_array($this->extensions[$fileType], $acceptedFileTypes)) {
                 return $this->getDI()->get($this->base . $this->extensions[$fileType]);
             } else {
@@ -80,48 +82,72 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
         throw new \ApiBird\InvalidTypeException('Unsupported Media Type', 415, $this);
     }
 
-    public function hasExtension($fileType = '', $acceptedFileTypes = [])
+    /**
+     * Return true if has configured extension
+     * @param string $fileType
+     * @param array $acceptedFileTypes
+     * @param string $defaultType
+     * @return boolean
+     */
+    protected function hasExtension($fileType = '', $acceptedFileTypes = [], $defaultType = '')
     {
-        if (isset($this->extensions[$fileType]) &&
-                in_array($this->extensions[$fileType], $acceptedFileTypes)) {
+        $di = $this->getDI();
+        if ((empty($fileType) || $fileType == '*/*') &&
+                $di->has($this->base . $defaultType)) {
+            return true;
+        } elseif (!empty($acceptedFileTypes) &&
+                isset($this->extensions[$fileType]) &&
+                in_array($this->extensions[$fileType], $acceptedFileTypes)
+        ) {
+            return true;
+        } elseif (empty($acceptedFileTypes) &&
+                isset($this->extensions[$fileType])) {
             return true;
         }
         return false;
     }
 
+    /**
+     * @see hasExtension
+     * @param string $fileType
+     * @param array $acceptedFileTypes
+     * @return boolean
+     */
     public function hasRequestExtension($fileType = '', $acceptedFileTypes = [])
     {
-        $di = $this->getDI();
-        if ((empty($fileType) || $fileType == '*/*') && $di->has($this->base . $this->defaultContentType)) {
-            return true;
-        } elseif (isset($this->extensions[$fileType]) &&
-                in_array($this->extensions[$fileType], $acceptedFileTypes)) {
-            return true;
-        }
-        return false;
+        return $this->hasExtension($fileType, $acceptedFileTypes, $this->defaultConsumes);
     }
 
+    /**
+     * @see hasExtension
+     * @param string $fileType
+     * @param array $acceptedFileTypes
+     * @return boolean
+     */
     public function hasResponseExtension($fileType = '', $acceptedFileTypes = [])
     {
-        $di = $this->getDI();
-        if ((empty($fileType) || $fileType == '*/*') && $di->has($this->base . $this->defaultAccept)) {
-            return true;
-        } elseif (isset($this->extensions[$fileType]) &&
-                in_array($this->extensions[$fileType], $acceptedFileTypes)) {
-            return true;
-        }
-        return false;
+        return $this->hasExtension($fileType, $acceptedFileTypes, $this->defaultProduces);
     }
 
-    public function setDefaultAccept($type)
+    /**
+     * Set default Consumes type
+     * @param string $type
+     * @return \ApiBird\ExtensionProvider
+     */
+    public function setDefaultConsumes($type)
     {
-        $this->defaultAccept = $type;
+        $this->defaultConsumes = $type;
         return $this;
     }
 
-    public function setDefaultContentType($type)
+    /**
+     * Set default Produces type
+     * @param string $type
+     * @return \ApiBird\ExtensionProvider
+     */
+    public function setDefaultProduces($type)
     {
-        $this->defaultContentType = $type;
+        $this->defaultProduces = $type;
         return $this;
     }
 
