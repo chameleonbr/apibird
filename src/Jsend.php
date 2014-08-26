@@ -83,4 +83,19 @@ class JSend
         return json_encode($this);
     }
 
+    public function toArray()
+    {
+        if (is_object($this->data)) {
+            $data = get_object_vars($this->data);
+        } else {
+            $data = $this->data;
+        }
+
+        return [
+            'status' => $this->status,
+            'message' => $this->message,
+            'data' => $data,
+        ];
+    }
+
 }

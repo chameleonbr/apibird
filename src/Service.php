@@ -11,6 +11,12 @@ class Service extends \Phalcon\Mvc\Micro
     {
         $dependencyInjector->set('request', '\\ApiBird\\Request', true);
         $dependencyInjector->set('response', '\\ApiBird\\Response', true);
+        set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext) {
+            var_dump(debug_backtrace());
+            var_dump($errfile);
+            die();
+            throw new \ApiBird\Error\BadRequestException();
+        });
         parent::__construct($dependencyInjector);
         if ($autoFinish) {
             $this->finish(function () {
@@ -24,14 +30,19 @@ class Service extends \Phalcon\Mvc\Micro
      * @param type $types
      * @return \ApiBird\Service
      */
-    public function consumes($types)
+    public function consumes($types = [])
     {
         $ext = $this->request->getContentType();
         $di = $this->getDI();
         if ($di['apibird']->hasRequestExtension($ext, $types)) {
             return $this;
         }
-        throw new \ApiBird\InvalidTypeException('Unsupported Media Type', 415, $this);
+        throw new \ApiBird\Error\UnsupportedMediaTypeException();
+    }
+
+    public function consumesExcept($types = [])
+    {
+        
     }
 
     /**
@@ -39,7 +50,7 @@ class Service extends \Phalcon\Mvc\Micro
      * @param type $types
      * @return \ApiBird\Service
      */
-    public function produces($types)
+    public function produces($types = [])
     {
         $ext = $this->request->getBestAccept();
         $di = $this->getDI();
@@ -47,7 +58,12 @@ class Service extends \Phalcon\Mvc\Micro
         if ($di['apibird']->hasResponseExtension($ext, $types)) {
             return $this;
         }
-        throw new \ApiBird\InvalidTypeException('Unsupported Media Type', 415, $this);
+        throw new \ApiBird\Error\UnsupportedMediaTypeException();
+    }
+
+    public function producesExcept($types = [])
+    {
+        
     }
 
     /**

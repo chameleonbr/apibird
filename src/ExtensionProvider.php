@@ -24,7 +24,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
             $di->set($this->base . $index, function() use ($handler) {
                 $instance = new $handler();
                 return $instance;
-            },true);
+            }, true);
         }
         return $this;
     }
@@ -45,7 +45,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     public function getRequestExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (empty($fileType) || $fileType == '*/*' && !empty($this->defaultConsumes)) {
+        if (empty($fileType) && !empty($this->defaultConsumes)) {
             return $this->getDI()->get($this->base . $this->defaultConsumes);
         } else {
             return $this->getExtension($fileType, $acceptedFileTypes);
@@ -54,7 +54,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     public function getResponseExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (empty($fileType) || $fileType == '*/*' && !empty($this->defaultProduces)) {
+        if (empty($fileType) && !empty($this->defaultProduces)) {
             return $this->getDI()->get($this->base . $this->defaultProduces);
         } else {
             return $this->getExtension($fileType, $acceptedFileTypes);
@@ -70,7 +70,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
      */
     public function getExtension($fileType = '', $acceptedFileTypes = [], $defaultType = '')
     {
-        if (empty($fileType) || $fileType == '*/*' && !empty($defaultType)) {
+        if (empty($fileType) && !empty($defaultType)) {
             return $this->getDI()->get($this->base . $defaultType);
         } else if (!empty($fileType) && isset($this->extensions[$fileType])) {
             if (!empty($acceptedFileTypes) && in_array($this->extensions[$fileType], $acceptedFileTypes)) {
@@ -79,7 +79,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
                 return $this->getDI()->get($this->base . $this->extensions[$fileType]);
             }
         }
-        throw new \ApiBird\InvalidTypeException('Unsupported Media Type', 415, $this);
+        throw new \ApiBird\UnsupportedMediaTypeException();
     }
 
     /**
@@ -92,7 +92,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
     protected function hasExtension($fileType = '', $acceptedFileTypes = [], $defaultType = '')
     {
         $di = $this->getDI();
-        if ((empty($fileType) || $fileType == '*/*') &&
+        if ((empty($fileType)) &&
                 $di->has($this->base . $defaultType)) {
             return true;
         } elseif (!empty($acceptedFileTypes) &&

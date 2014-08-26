@@ -5,7 +5,6 @@ if (isset($_REQUEST['DEBUG_MODE']) && $_REQUEST['DEBUG_MODE'] > 0) {
     xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
 }
 
-
 require '../../vendor/autoload.php';
 
 // DI is necessary to Service Class
@@ -20,6 +19,8 @@ $di->set('apibird', function() {
         'form' => '\\ApiBird\\Extension\\Form',
         'html' => '\\ApiBird\\Extension\\Html',
         'text' => '\\ApiBird\\Extension\\Text',
+        'csv' => '\\ApiBird\\Extension\\Csv',
+        'multipart' => '\\ApiBird\\Extension\\Multipart',
     ]);
     $api->setDefaultProduces('json');
     $api->setDefaultConsumes('form');
@@ -37,7 +38,6 @@ $app->get('/', function() use ($app) {
     return $return;
 });
 
-
 $app->post('/', function() use ($app) {
     //produces or consumes calls to check if the client sends or expects extension
     $app->consumes(['json', 'xml', 'form', 'text'])->produces(['json', 'xml', 'form', 'text', 'html']);
@@ -47,8 +47,24 @@ $app->post('/', function() use ($app) {
 
 $app->post('/all', function() use ($app) {
     //without consumes and/or produces, accept all registered types
+    //$app->producesExcept(['yaml']);
     $return = $app->request->getBody();
     return $return;
+});
+
+$app->options('(/.*)*', function() use ($app) {
+    if (isset($_SERVER['HTTP_ORIGIN'])) {
+        header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Max-Age: 86400');
+    }
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, HEAD, OPTIONS");
+    }
+
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+    }
 });
 
 try {
