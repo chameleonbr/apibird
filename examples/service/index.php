@@ -26,6 +26,16 @@ $di->set('apibird', function() {
     $api->setDefaultConsumes('form');
     return $api;
 }, true);
+// this enables serverCache method
+$di->set('cache', function() {
+    $frontCache = new Phalcon\Cache\Frontend\Data([
+        "lifetime" => 3600
+    ]);
+    $cache = new Phalcon\Cache\Backend\Apc($frontCache, [
+        'prefix' => 'datacache'
+    ]);
+    return $cache;
+}, true);
 
 // create api bird
 $app = new \ApiBird\Service($di);
@@ -41,8 +51,29 @@ $app->get('/', function() use ($app) {
 $app->post('/', function() use ($app) {
     //produces or consumes calls to check if the client sends or expects extension
     $app->consumes(['json', 'xml', 'form', 'text'])->produces(['json', 'xml', 'form', 'text', 'html']);
-    $return = $app->request->getBody();
-    return $return;
+    $result = $app->request->getBody();
+    return $result;
+});
+
+$app->post('/cached/{name}', function($name = '') use ($app) {
+    //produces or consumes calls to check if the client sends or expects extension
+    $app->consumes(['json', 'xml', 'form', 'text'])->produces(['json', 'xml', 'form', 'text', 'html']);
+    $result = $app->serverCache($app->request->getBody(), function($data) use ($app) {
+        $data['xxxx'] = 'yyy';
+        sleep(1);
+        return $data;
+    }, 20);
+    return $result;
+});
+
+
+$app->get('/cached', function() use ($app) {
+    //produces or consumes calls to check if the client sends or expects extension
+    $app->produces(['json', 'xml', 'form', 'text', 'html']);
+    $result = $app->serverCache($app->request->getBody(), function($data) use ($app) {
+        return array('myresult' => 'ok');
+    }, 15);
+    return $result;
 });
 
 $app->post('/all', function() use ($app) {
@@ -69,8 +100,6 @@ $app->options('(/.*)*', function() use ($app) {
 
 try {
     $app->handle();
-} catch (\ApiBird\InvalidTypeException $e) {
-    echo $e->getMessage();
 } catch (\Exception $e) {
     echo $e->getMessage();
 }

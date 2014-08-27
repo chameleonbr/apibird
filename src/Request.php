@@ -4,6 +4,7 @@ namespace ApiBird;
 
 class Request extends \Phalcon\Http\Request
 {
+
     /**
      *  Return body from specified type
      * @param array $types

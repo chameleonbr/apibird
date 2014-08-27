@@ -79,7 +79,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
                 return $this->getDI()->get($this->base . $this->extensions[$fileType]);
             }
         }
-        throw new \ApiBird\UnsupportedMediaTypeException();
+        throw new \ApiBird\Error\UnsupportedMediaTypeException();
     }
 
     /**

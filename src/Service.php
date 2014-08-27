@@ -6,23 +6,28 @@ class Service extends \Phalcon\Mvc\Micro
 {
 
     protected $base = 'apibird.';
+    protected $options = [];
 
-    public function __construct($dependencyInjector = null, $autoFinish = true)
+    public function __construct($dependencyInjector = null, $options = [])
     {
+        $defaultOptions = [
+            'autoFinish' => true,
+            'cacheService' => 'cache',
+        ];
+
+        $this->options = array_merge($defaultOptions, $options);
+
         $dependencyInjector->set('request', '\\ApiBird\\Request', true);
         $dependencyInjector->set('response', '\\ApiBird\\Response', true);
-        set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext) {
-            var_dump(debug_backtrace());
-            var_dump($errfile);
-            die();
-            throw new \ApiBird\Error\BadRequestException();
-        });
-        parent::__construct($dependencyInjector);
-        if ($autoFinish) {
+        /* set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext) {
+          throw new \ApiBird\Error\BadRequestException();
+          }); */
+        if ($this->options['autoFinish']) {
             $this->finish(function () {
                 return $this->response->apiSend($this);
             });
         }
+        parent::__construct($dependencyInjector);
     }
 
     /**
@@ -66,6 +71,24 @@ class Service extends \Phalcon\Mvc\Micro
         
     }
 
+    public function serverCache($dataReceived, $function, $limit = 3600)
+    {
+        $di = $this->getDI();
+        if ($di->has($this->options['cacheService'])) {
+            $hash = $this->getHash($dataReceived);
+            $dataCache = $di['cache']->get($hash);
+            if (!$dataCache) {
+                $dataReturn = $function($dataReceived);
+                $di['cache']->save($hash, $dataReturn, $limit);
+            } else {
+                $dataReturn = $dataCache;
+            }
+        } else {
+            $dataReturn = $function($dataReceived);
+        }
+        return $dataReturn;
+    }
+
     /**
      * Get body data after parse type
      * @return array
@@ -73,6 +96,17 @@ class Service extends \Phalcon\Mvc\Micro
     public function getBody()
     {
         return $this->request->getBody();
+    }
+
+    public function getHash($data)
+    {
+        $method = $_SERVER['REQUEST_METHOD'];
+        if (is_array($method)) {
+            $method = implode('', $method);
+        }
+        $path = $this->getRouter()->getRewriteUri();
+        $hash = md5($method . $path . json_encode($data));
+        return $hash;
     }
 
 }
