@@ -101,9 +101,6 @@ class Service extends \Phalcon\Mvc\Micro
     public function getHash($data)
     {
         $method = $_SERVER['REQUEST_METHOD'];
-        if (is_array($method)) {
-            $method = implode('', $method);
-        }
         $path = $this->getRouter()->getRewriteUri();
         $hash = md5($method . $path . json_encode($data));
         return $hash;
