@@ -4,7 +4,7 @@
     "authors": [
         {
             "name": "André Avila",
-            "email": "andre.alexandre.avila@gmail.com"
+            "email": "chameleonbr@gmail.com"
         }
     ],
     "require": {
@@ -16,5 +16,8 @@
         "psr-4": {
             "ApiBird\\": "src/"
         }
+    },
+    "suggest" : {
+        
     }
 }
