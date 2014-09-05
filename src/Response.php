@@ -17,8 +17,19 @@ class Response extends \Phalcon\Http\Response
         $this->setStatusCode($statusCode, $statusText);
         $this->setHeader('Content-Type', $ext);
         $handler = $di['apibird']->getResponseExtension($ext);
+        if (is_object($data)) {
+            $data = get_object_vars($data);
+        }
         $this->setContent($handler->toFormat($data));
-        return $this->sendHeaders()->send();
+        return $this->sendHeaders()->send()->exitOnError($statusCode);
+    }
+
+    public function exitOnError($status = 200)
+    {
+        /*if ($status >= 400) {
+            exit();
+        }*/
+        return $this;
     }
 
     public function setHeaders($headers)

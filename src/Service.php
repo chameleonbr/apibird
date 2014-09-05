@@ -38,7 +38,8 @@ class Service extends \Phalcon\Mvc\Micro
         if ($di['apibird']->hasRequestExtension($ext, $types)) {
             return $this;
         }
-        throw new \ApiBird\Error\UnsupportedMediaTypeException();
+        return $this->response->unsupportedMediaType();
+        //throw new \ApiBird\Error\UnsupportedMediaTypeException();
     }
 
     public function consumesExcept($types = [])
@@ -59,7 +60,9 @@ class Service extends \Phalcon\Mvc\Micro
         if ($di['apibird']->hasResponseExtension($ext, $types)) {
             return $this;
         }
-        throw new \ApiBird\Error\UnsupportedMediaTypeException();
+        
+        return $this->response->unsupportedMediaType();
+        //throw new \ApiBird\Error\UnsupportedMediaTypeException();
     }
 
     public function producesExcept($types = [])
@@ -116,14 +119,4 @@ class Service extends \Phalcon\Mvc\Micro
         $hash = md5($method . $path . json_encode($data));
         return $hash;
     }
-
-    public function __call($name, $arguments)
-    {
-        if (method_exists($this->response, $name)) {
-
-            return call_user_func_array(array($this->response, $name), $arguments);
-        }
-        throw new \BadMethodCallException('Undefined Method');
-    }
-
 }

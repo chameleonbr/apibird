@@ -3,7 +3,7 @@
 namespace ApiBird;
 
 /**
- * @SWG\Model(id="JSendResponse")
+ * @SWG\Model(id="JSend")
  */
 class JSend
 {
@@ -34,24 +34,27 @@ class JSend
         }
     }
 
-    public static function success($data = null)
+    public static function success($message = null, $data = null)
     {
         $response = new self(self::STATUS_SUCCESS);
+        $response->message = $message;
         $response->data = $data;
         return $response;
     }
 
-    public static function fail($data = null)
+    public static function fail($message = null, $data = null)
     {
         $response = new self(self::STATUS_FAIL);
+        $response->message = $message;
         $response->data = $data;
         return $response;
     }
 
-    public static function error($message = null)
+    public static function error($message = null, $data = null)
     {
         $response = new self(self::STATUS_ERROR);
         $response->message = $message;
+        $response->data = $data;
         return $response;
     }
 
