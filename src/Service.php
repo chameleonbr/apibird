@@ -19,14 +19,10 @@ class Service extends \Phalcon\Mvc\Micro
 
         $dependencyInjector->set('request', '\\ApiBird\\Request', true);
         $dependencyInjector->set('response', '\\ApiBird\\Response', true);
-        /* set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext) {
-          throw new \ApiBird\Error\BadRequestException();
-          }); */
-        if ($this->options['autoFinish']) {
-            $this->finish(function () {
-                return $this->response->apiSend($this);
-            });
-        }
+
+        set_error_handler(function($errno, $errstr, $errfile, $errline) {
+            throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+        });
         parent::__construct($dependencyInjector);
     }
 
@@ -73,19 +69,34 @@ class Service extends \Phalcon\Mvc\Micro
 
     public function serverCache($dataReceived, $function, $limit = 3600)
     {
-        $di = $this->getDI();
-        if ($di->has($this->options['cacheService'])) {
+        if ($this->getDI()->has($this->options['cacheService'])) {
             $hash = $this->getHash($dataReceived);
-            $dataCache = $di['cache']->get($hash);
-            if (!$dataCache) {
-                $dataReturn = $function($dataReceived);
-                $di['cache']->save($hash, $dataReturn, $limit);
-            } else {
-                $dataReturn = $dataCache;
-            }
+            $dataReturn = $this->getDataCache($dataReceived, $hash, $function, $limit);
         } else {
             $dataReturn = $function($dataReceived);
         }
+        return $dataReturn;
+    }
+
+    protected function getDataCache($dataReceived, $hash, $function, $limit)
+    {
+        $realLimit = 86400;
+        $di = $this->getDI();
+        $dataCache = $di['cache']->get($hash);
+        if (!empty($dataCache) && time() >= $dataCache['expires']) {
+            try {
+                $dataReturn = $function($dataReceived);
+                $di['cache']->save($hash, ['data' => $dataReturn, 'expires' => time() + $limit], $realLimit);
+            } catch (\Exception $e) {
+                $dataReturn = $dataCache['data'];
+            }
+        } elseif (empty($dataCache)) {
+            $this->internalServerError();
+            exit();
+        } else {
+            $dataReturn = $dataCache['data'];
+        }
+
         return $dataReturn;
     }
 
@@ -104,6 +115,15 @@ class Service extends \Phalcon\Mvc\Micro
         $path = $this->getRouter()->getRewriteUri();
         $hash = md5($method . $path . json_encode($data));
         return $hash;
+    }
+
+    public function __call($name, $arguments)
+    {
+        if (method_exists($this->response, $name)) {
+
+            return call_user_func_array(array($this->response, $name), $arguments);
+        }
+        throw new \BadMethodCallException('Undefined Method');
     }
 
 }
