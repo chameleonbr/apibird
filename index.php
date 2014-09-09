@@ -6,7 +6,7 @@ $di = new \Phalcon\DI\FactoryDefault();
 
 //now register the extensions globally
 $di->set('apibird', function() {
-    $api = new \ApiBird\ExtensionProvider();
+    $api = new \ApiBird\ServiceProvider();
     $api->registerExtensions([
         'json' => '\\ApiBird\\Extension\\Json',
         'xml' => '\\ApiBird\\Extension\\Xml',
@@ -32,7 +32,7 @@ $di->set('cache', function() {
 }, true);
 
 // create api bird
-$app = new \ApiBird\Service($di);
+$app = new \ApiBird\Micro($di);
 
 $app->get('/', function() use ($app) {
     //produces or consumes calls to check if the client sends expected extension

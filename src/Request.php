@@ -25,6 +25,9 @@ class Request extends \Phalcon\Http\Request
         if ($contentType == '*/*') {
             $contentType = '';
         }
+        if (empty($contentType)) {
+            $contentType = $this->getDI()->get('apibird')->getDefaultConsumes();
+        }
         return $contentType;
     }
 
@@ -33,6 +36,9 @@ class Request extends \Phalcon\Http\Request
         $accept = parent::getBestAccept();
         if ($accept == '*/*') {
             $accept = '';
+        }
+        if (empty($accept)) {
+            $accept = $this->getDI()->get('apibird')->getDefaultProduces();
         }
         return $accept;
     }

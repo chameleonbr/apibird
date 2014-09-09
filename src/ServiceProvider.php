@@ -2,18 +2,19 @@
 
 namespace ApiBird;
 
-class ExtensionProvider extends \Phalcon\DI\Injectable
+class ServiceProvider extends \Phalcon\DI\Injectable
 {
 
     protected $base = 'apibird.';
     protected $extensions = array();
     protected $defaultProduces = null;
     protected $defaultConsumes = null;
+    protected $corsEnabled = false;
 
     /**
      * Register Extensions 
      * @param type $handlers
-     * @return \ApiBird\Service
+     * @return \ApiBird\Micro
      */
     public function registerExtensions($handlers)
     {
@@ -28,12 +29,11 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
         }
         return $this;
     }
-
     /**
      * Register Extension and file types 
      * @param type $serviceName
      * @param type $types
-     * @return \ApiBird\Service
+     * @return \ApiBird\Micro
      */
     public function registerExtension($serviceName, $types)
     {
@@ -45,20 +45,12 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
 
     public function getRequestExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (empty($fileType) && !empty($this->defaultConsumes)) {
-            return $this->getDI()->get($this->base . $this->defaultConsumes);
-        } else {
-            return $this->getExtension($fileType, $acceptedFileTypes);
-        }
+        return $this->getExtension($fileType, $acceptedFileTypes, $this->defaultConsumes);
     }
 
     public function getResponseExtension($fileType = '', $acceptedFileTypes = [])
     {
-        if (empty($fileType) && !empty($this->defaultProduces)) {
-            return $this->getDI()->get($this->base . $this->defaultProduces);
-        } else {
-            return $this->getExtension($fileType, $acceptedFileTypes);
-        }
+        return $this->getExtension($fileType, $acceptedFileTypes, $this->defaultProduces);
     }
 
     /**
@@ -79,7 +71,6 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
                 return $this->getDI()->get($this->base . $this->extensions[$fileType]);
             }
         }
-        throw new \ApiBird\Error\UnsupportedMediaTypeException();
     }
 
     /**
@@ -132,7 +123,7 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
     /**
      * Set default Consumes type
      * @param string $type
-     * @return \ApiBird\ExtensionProvider
+     * @return \ApiBird\ServiceProvider
      */
     public function setDefaultConsumes($type)
     {
@@ -143,12 +134,62 @@ class ExtensionProvider extends \Phalcon\DI\Injectable
     /**
      * Set default Produces type
      * @param string $type
-     * @return \ApiBird\ExtensionProvider
+     * @return \ApiBird\ServiceProvider
      */
     public function setDefaultProduces($type)
     {
         $this->defaultProduces = $type;
         return $this;
+    }
+
+    public function getDefaultConsumes()
+    {
+        $ext = $this->getDefaultConsumesExtension()->getTypes();
+        return $ext[0];
+    }
+
+    public function getDefaultProduces()
+    {
+        $ext = $this->getDefaultProducesExtension()->getTypes();
+        return $ext[0];
+    }
+
+    public function getDefaultConsumesExtension()
+    {
+        if (!empty($this->defaultConsumes)) {
+            return $this->getDI()->get($this->base . $this->defaultConsumes);
+        }
+        return false;
+    }
+
+    public function getDefaultProducesExtension()
+    {
+        if (!empty($this->defaultProduces)) {
+            return $this->getDI()->get($this->base . $this->defaultProduces);
+        }
+        return false;
+    }
+
+    public function enableCors()
+    {
+        $this->corsEnabled = true;
+        if (isset($_SERVER['HTTP_ORIGIN'])) {
+            header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+            header('Access-Control-Allow-Credentials: true');
+            header('Access-Control-Max-Age: 86400');
+        }
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+            header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, HEAD, OPTIONS");
+        }
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+        }
+        return $this;
+    }
+
+    public function corsEnabled()
+    {
+        return $this->corsEnabled;
     }
 
 }

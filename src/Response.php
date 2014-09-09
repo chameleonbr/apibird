@@ -17,6 +17,9 @@ class Response extends \Phalcon\Http\Response
         $this->setStatusCode($statusCode, $statusText);
         $this->setHeader('Content-Type', $ext);
         $handler = $di['apibird']->getResponseExtension($ext);
+        if(empty($handler)){
+            $handler = $di['apibird']->getDefaultProducesExtension();
+        }
         if (is_object($data)) {
             $data = get_object_vars($data);
         }
@@ -26,9 +29,9 @@ class Response extends \Phalcon\Http\Response
 
     public function exitOnError($status = 200)
     {
-        /*if ($status >= 400) {
+        if ($status >= 400) {
             exit();
-        }*/
+        }
         return $this;
     }
 
@@ -226,7 +229,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function unsupportedMediaType($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 413, 'Unsupported Media Type');
+        return $this->sendResponse($data, $headers, 415, 'Unsupported Media Type');
     }
 
     /**

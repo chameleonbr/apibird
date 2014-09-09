@@ -2,7 +2,7 @@
 
 namespace ApiBird;
 
-class Service extends \Phalcon\Mvc\Micro
+class Micro extends \Phalcon\Mvc\Micro
 {
 
     protected $base = 'apibird.';
@@ -11,7 +11,6 @@ class Service extends \Phalcon\Mvc\Micro
     public function __construct($dependencyInjector = null, $options = [])
     {
         $defaultOptions = [
-            'autoFinish' => true,
             'cacheService' => 'cache',
         ];
 
@@ -23,13 +22,28 @@ class Service extends \Phalcon\Mvc\Micro
         set_error_handler(function($errno, $errstr, $errfile, $errline) {
             throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
         });
+        /* if ($dependencyInjector->get('apibird')->corsEnabled()) {
+          $this->options('^(/.*)$', function() {
+          return '';
+          });
+          } */
         parent::__construct($dependencyInjector);
+    }
+
+    public function handle($uri = null)
+    {
+        if ($this->apibird->corsEnabled()) {
+            $this->options('^(/.*)$', function() {
+                return '';
+            });
+        }
+        return parent::handle($uri);
     }
 
     /**
      * Read the Header Content-Type and check if data can be consumed
      * @param type $types
-     * @return \ApiBird\Service
+     * @return \ApiBird\Micro
      */
     public function consumes($types = [])
     {
@@ -38,19 +52,13 @@ class Service extends \Phalcon\Mvc\Micro
         if ($di['apibird']->hasRequestExtension($ext, $types)) {
             return $this;
         }
-        return $this->response->unsupportedMediaType();
-        //throw new \ApiBird\Error\UnsupportedMediaTypeException();
-    }
-
-    public function consumesExcept($types = [])
-    {
-        
+        return $this->response->unsupportedMediaType('Invalid Content Type Header '.$ext);
     }
 
     /**
      * Read the Header Accept and check if data can be produced
      * @param type $types
-     * @return \ApiBird\Service
+     * @return \ApiBird\Micro
      */
     public function produces($types = [])
     {
@@ -60,16 +68,17 @@ class Service extends \Phalcon\Mvc\Micro
         if ($di['apibird']->hasResponseExtension($ext, $types)) {
             return $this;
         }
-        
-        return $this->response->unsupportedMediaType();
-        //throw new \ApiBird\Error\UnsupportedMediaTypeException();
+
+        return $this->response->unsupportedMediaType('Invalid Accept Header '.$ext);
     }
 
-    public function producesExcept($types = [])
-    {
-        
-    }
-
+    /**
+     * Get data from cache or function
+     * @param array $dataReceived
+     * @param callable $function
+     * @param int $limit
+     * @return mixed
+     */
     public function serverCache($dataReceived, $function, $limit = 3600)
     {
         if ($this->getDI()->has($this->options['cacheService'])) {
@@ -81,6 +90,15 @@ class Service extends \Phalcon\Mvc\Micro
         return $dataReturn;
     }
 
+    /**
+     * Get data from cache or call function to return data or store cache
+     * If function throw any Exception this function returns previous data cache
+     * @param array $dataReceived array data received
+     * @param string $hash hash of method + route + data
+     * @param callable $function calls function if cache is expired
+     * @param int $limit limit of cache
+     * @return mixed
+     */
     protected function getDataCache($dataReceived, $hash, $function, $limit)
     {
         $realLimit = 86400;
@@ -112,6 +130,11 @@ class Service extends \Phalcon\Mvc\Micro
         return $this->request->getBody();
     }
 
+    /**
+     * Return hash of (method + path + data)
+     * @param array $data data received
+     * @return string
+     */
     public function getHash($data)
     {
         $method = $_SERVER['REQUEST_METHOD'];
@@ -119,4 +142,5 @@ class Service extends \Phalcon\Mvc\Micro
         $hash = md5($method . $path . json_encode($data));
         return $hash;
     }
+
 }
