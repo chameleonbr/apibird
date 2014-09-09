@@ -10,6 +10,14 @@ class ServiceProvider extends \Phalcon\DI\Injectable
     protected $defaultProduces = null;
     protected $defaultConsumes = null;
     protected $corsEnabled = false;
+    protected $errorDataHandler = null;
+
+    public function __construct()
+    {
+        $this->setErrorDataHandler(function($data = null, $code = null, $message = null) {
+            return $data;
+        });
+    }
 
     /**
      * Register Extensions 
@@ -29,6 +37,7 @@ class ServiceProvider extends \Phalcon\DI\Injectable
         }
         return $this;
     }
+
     /**
      * Register Extension and file types 
      * @param type $serviceName
@@ -190,6 +199,17 @@ class ServiceProvider extends \Phalcon\DI\Injectable
     public function corsEnabled()
     {
         return $this->corsEnabled;
+    }
+
+    public function setErrorDataHandler($function)
+    {
+        $this->errorDataHandler = $function;
+        return $this;
+    }
+
+    public function getErrorDataHandler()
+    {
+        return $this->errorDataHandler;
     }
 
 }
