@@ -32,8 +32,8 @@ class Multipart implements \ApiBird\ExtensionInterface
      */
     public function toFormat($data)
     {
-        throw new \ApiBird\Error\InternalServerErrorException();
-        //return http_build_query($data);
+        $di = \Phalcon\DI\FactoryDefault::getDefault();
+        $di['response']->internalServerError('Unable to write format.');
     }
 
     public static function getTypes()

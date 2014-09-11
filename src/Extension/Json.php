@@ -16,7 +16,8 @@ class Json implements \ApiBird\ExtensionInterface
     {
         $data = json_decode($data, true);
         if (empty($data) && json_last_error() != JSON_ERROR_NONE) {
-            throw new \ApiBird\Error\BadRequestException('Unable to parse data. Check data format.');
+            $di = \Phalcon\DI\FactoryDefault::getDefault();
+            $di['response']->badRequest('Unable to parse data. Check format.');
         }
         return $data;
     }
@@ -26,7 +27,8 @@ class Json implements \ApiBird\ExtensionInterface
         $data = json_encode($data, JSON_NUMERIC_CHECK);
         $error = json_last_error();
         if (empty($data) && $error != JSON_ERROR_NONE) {
-            throw new \ApiBird\Error\InternalServerErrorException($error);
+            $di = \Phalcon\DI\FactoryDefault::getDefault();
+            $di['response']->internalServerError('Unable to write format.');
         }
         return $data;
     }

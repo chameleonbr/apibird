@@ -192,7 +192,10 @@ class ServiceProvider extends \Phalcon\DI\Injectable
         }
         if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
             header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+        } else {
+            header("Access-Control-Allow-Headers: X-Accept-Charset,X-Accept,Accept,Content-Type,Location,Authorization");
         }
+        header("Access-Control-Expose-Headers: Location, Link, ETag");
         return $this;
     }
 

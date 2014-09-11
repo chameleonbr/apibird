@@ -4,6 +4,7 @@ namespace ApiBird\Extension;
 
 class Csv implements \ApiBird\ExtensionInterface
 {
+
     protected static $types = [
         'text/csv'
     ];
@@ -42,7 +43,8 @@ class Csv implements \ApiBird\ExtensionInterface
                 }
                 fclose($fp);
             } else {
-                throw new \ApiBird\Error\InternalServerErrorException();
+                $di = \Phalcon\DI\FactoryDefault::getDefault();
+                $di['response']->internalServerError('Unable to write format.');
             }
         }
         return '';

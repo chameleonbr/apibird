@@ -11,9 +11,8 @@ class Xml implements \ApiBird\ExtensionInterface
         'application/xml',
         'text/xml'
     ];
+    protected $options = ['root' => 'result', 'list' => 'list'];
 
-    protected $options = ['root' => 'result','list' => 'list'];
-    
     public function fromFormat($data)
     {
         $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOWARNING | LIBXML_NOERROR);
@@ -21,7 +20,8 @@ class Xml implements \ApiBird\ExtensionInterface
             $json = json_encode($xml);
             return json_decode($json, true);
         } else {
-            throw new \ApiBird\Error\BadRequestException('Unable to parse data. Check data format.');
+            $di = \Phalcon\DI\FactoryDefault::getDefault();
+            $di['response']->badRequest('Unable to parse data. Check format.');
         }
     }
 
@@ -32,13 +32,14 @@ class Xml implements \ApiBird\ExtensionInterface
                 Array2XML::init('1.0', 'UTF-8', false);
                 $xml = Array2XML::createXML($this->options['root'], $data);
                 return $xml->saveXML();
-            }else{
+            } else {
                 Array2XML::init('1.0', 'UTF-8', false);
                 $xml = Array2XML::createXML($this->options['list'], array($this->options['root'] => $data));
                 return $xml->saveXML();
             }
         } catch (\Exception $e) {
-            throw new \ApiBird\Error\InternalServerErrorException($e->getMessage());
+            $di = \Phalcon\DI\FactoryDefault::getDefault();
+            $di['response']->internalServerError('Unable to write format.');
         }
     }
 

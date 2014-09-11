@@ -13,7 +13,7 @@ class Request extends \Phalcon\Http\Request
     public function getBody($types = [])
     {
         $di = $this->getDI();
-        $data = $this->getRawBody();
+        $data = file_get_contents('php://input');
         $contentType = $this->getContentType();
         $extension = $di['apibird']->getRequestExtension($contentType, $types);
         return $extension->fromFormat($data);

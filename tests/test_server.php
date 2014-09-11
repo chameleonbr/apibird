@@ -1,5 +1,4 @@
 <?php
-
 require 'vendor/autoload.php';
 // DI is necessary to Service Class
 $di = new \Phalcon\DI\FactoryDefault();
@@ -34,19 +33,18 @@ $di->set('cache', function() {
 // create api bird
 $app = new \ApiBird\Micro($di);
 
-$app->get('/', function() use ($app) {
+$app->get('/{response}', function($res) use ($app) {
     //produces or consumes calls to check if the client sends expected extension
     $app->produces(['json', 'xml', 'html', 'form']);
     $return = ['xpto' => 123];
-    //array returned is converted to Accept header extension
-    return $app->ok($return);
+    return $app->response->$res($return);
 });
 
 $app->post('/', function() use ($app) {
     //produces or consumes calls to check if the client sends or expects extension
     $app->consumes(['json', 'xml', 'form', 'text'])->produces(['json', 'xml', 'form', 'text', 'html']);
     $result = $app->request->getBody();
-    return $app->created($result);
+    return $app->response->created($result);
 });
 
 $app->post('/cached/{name}', function($name = '') use ($app) {
@@ -55,7 +53,7 @@ $app->post('/cached/{name}', function($name = '') use ($app) {
     $result = $app->serverCache($app->request->getBody(), function($data) use ($app) {
         return $data;
     }, 20);
-    return $app->ok($result);
+    return $app->response->ok($result);
 });
 
 $app->get('/cached', function() use ($app) {
@@ -64,19 +62,14 @@ $app->get('/cached', function() use ($app) {
     $result = $app->serverCache($app->request->getBody(), function($data) use ($app) {
         return array('myresult' => 'ok');
     }, 15);
-    return $app->ok($result);
+    return $app->response->ok($result);
 });
 
 $app->post('/all', function() use ($app) {
     //without consumes and/or produces, accept all registered types
     //$app->producesExcept(['yaml']);
     $return = $app->request->getBody();
-    return $app->ok($return);
-});
-
-//Enable CORS
-
-$app->options('(/.*)*', function() use ($app) {
+    return $app->response->ok($return);
 });
 
 try {
@@ -84,4 +77,3 @@ try {
 } catch (\Exception $e) {
     echo $e->getMessage();
 }
-
