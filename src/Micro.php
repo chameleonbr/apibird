@@ -22,11 +22,6 @@ class Micro extends \Phalcon\Mvc\Micro
         set_error_handler(function($errno, $errstr, $errfile, $errline) {
             throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
         });
-        /* if ($dependencyInjector->get('apibird')->corsEnabled()) {
-          $this->options('^(/.*)$', function() {
-          return '';
-          });
-          } */
         parent::__construct($dependencyInjector);
     }
 

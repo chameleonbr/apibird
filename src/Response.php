@@ -13,6 +13,14 @@ class Response extends \Phalcon\Http\Response
     {
         $di = $this->getDI();
         $ext = $di['request']->getBestAccept();
+        $charset = $di['request']->getProducesCharset();
+
+        if ($charset != 'utf-8') {
+            $ext .= '; charset=' . $charset;
+            $statusText = mb_convert_encoding($statusText, $charset, 'utf-8');
+            mb_convert_variables($charset, 'utf-8', $data);
+        }
+
         $this->setHeaders($headers);
         $this->setStatusCode($statusCode, $statusText);
         $this->setHeader('Content-Type', $ext);
