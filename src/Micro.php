@@ -47,7 +47,7 @@ class Micro extends \Phalcon\Mvc\Micro
         if ($di['apibird']->hasRequestExtension($ext, $types)) {
             return $this;
         }
-        return $this->response->unsupportedMediaType('Invalid Content Type Header '.$ext);
+        return $this->response->unsupportedMediaType('Invalid Content Type Header ' . $ext);
     }
 
     /**
@@ -64,7 +64,7 @@ class Micro extends \Phalcon\Mvc\Micro
             return $this;
         }
 
-        return $this->response->unsupportedMediaType('Invalid Accept Header '.$ext);
+        return $this->response->unsupportedMediaType('Invalid Accept Header ' . $ext);
     }
 
     /**
@@ -74,11 +74,11 @@ class Micro extends \Phalcon\Mvc\Micro
      * @param int $limit
      * @return mixed
      */
-    public function serverCache($dataReceived, $function, $limit = 3600)
+    public function cache($dataReceived, $function, $limit = 3600, $realLimit = 86400)
     {
         if ($this->getDI()->has($this->options['cacheService'])) {
             $hash = $this->getHash($dataReceived);
-            $dataReturn = $this->getDataCache($dataReceived, $hash, $function, $limit);
+            $dataReturn = $this->getDataCache($dataReceived, $hash, $function, $limit, $realLimit);
         } else {
             $dataReturn = $function($dataReceived);
         }
@@ -94,9 +94,8 @@ class Micro extends \Phalcon\Mvc\Micro
      * @param int $limit limit of cache
      * @return mixed
      */
-    protected function getDataCache($dataReceived, $hash, $function, $limit)
+    protected function getDataCache($dataReceived, $hash, $function, $limit, $realLimit = 86400)
     {
-        $realLimit = 86400;
         $di = $this->getDI();
         $dataCache = $di['cache']->get($hash);
         if (!empty($dataCache) && time() >= $dataCache['expires']) {
@@ -107,7 +106,7 @@ class Micro extends \Phalcon\Mvc\Micro
                 $dataReturn = $dataCache['data'];
             }
         } elseif (empty($dataCache)) {
-            $this->internalServerError();
+            $this->response->internalServerError();
             exit();
         } else {
             $dataReturn = $dataCache['data'];

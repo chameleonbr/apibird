@@ -23,7 +23,7 @@ class Response extends \Phalcon\Http\Response
 
         $this->setHeaders($headers);
         $this->setStatusCode($statusCode, $statusText);
-        $this->setHeader('Content-Type', $ext);
+
         $handler = $di['apibird']->getResponseExtension($ext);
         if (empty($handler)) {
             $handler = $di['apibird']->getDefaultProducesExtension();
@@ -31,11 +31,17 @@ class Response extends \Phalcon\Http\Response
         if (is_object($data)) {
             $data = get_object_vars($data);
         }
-        if ($statusCode >= 400) {
-            $error = $di['apibird']->getErrorDataHandler();
-            $data = $error($data, $statusCode, $statusText);
+
+        $fn = $di['apibird']->getDataHandler();
+        if (is_callable($fn)) {
+            $data = $fn($data, $statusCode, $statusText);
         }
-        $this->setContent($handler->toFormat($data));
+        
+        $this->setHeader('Content-Type', $ext);
+
+        if (!empty($data)) {
+            $this->setContent($handler->toFormat($data));
+        }
         return $this->sendHeaders()->send()->exitOnError($statusCode);
     }
 
@@ -98,6 +104,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function noContent($headers = [])
     {
+        //var_dump($headers);
         return $this->sendResponse(null, $headers, 204, 'No Content');
     }
 

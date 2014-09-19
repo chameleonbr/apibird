@@ -52,7 +52,7 @@ $app->post('/', function() use ($app) {
 $app->post('/cached/{name}', function($name = '') use ($app) {
     //produces or consumes calls to check if the client sends or expects extension
     $app->consumes(['json', 'xml', 'form', 'text'])->produces(['json', 'xml', 'form', 'text', 'html']);
-    $result = $app->serverCache($app->request->getBody(), function($data) use ($app) {
+    $result = $app->cache($app->request->getBody(), function($data) use ($app) {
         return $data;
     }, 20);
     return $app->ok($result);
@@ -61,7 +61,7 @@ $app->post('/cached/{name}', function($name = '') use ($app) {
 $app->get('/cached', function() use ($app) {
     //produces or consumes calls to check if the client sends or expects extension
     $app->produces(['json', 'xml', 'form', 'text', 'html']);
-    $result = $app->serverCache($app->request->getBody(), function($data) use ($app) {
+    $result = $app->cache($app->request->getBody(), function($data) use ($app) {
         return array('myresult' => 'ok');
     }, 15);
     return $app->ok($result);

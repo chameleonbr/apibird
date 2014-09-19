@@ -10,11 +10,11 @@ class ServiceProvider extends \Phalcon\DI\Injectable
     protected $defaultProduces = null;
     protected $defaultConsumes = null;
     protected $corsEnabled = false;
-    protected $errorDataHandler = null;
+    protected $dataHandler = null;
 
     public function __construct()
     {
-        $this->setErrorDataHandler(function($data = null, $code = null, $message = null) {
+        $this->setDataHandler(function($data = null, $code = null, $message = null) {
             return $data;
         });
     }
@@ -188,14 +188,14 @@ class ServiceProvider extends \Phalcon\DI\Injectable
             header('Access-Control-Max-Age: 86400');
         }
         if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-            header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, HEAD, OPTIONS");
+            header("Access-Control-Allow-Methods: GET,POST,PUT,DELETE,HEAD,OPTIONS,PATCH");
         }
         if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
             header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
         } else {
             header("Access-Control-Allow-Headers: X-Accept-Charset,X-Accept,Accept,Content-Type,Location,Authorization");
         }
-        header("Access-Control-Expose-Headers: Location, Link, ETag");
+        header("Access-Control-Expose-Headers: Location,Link,ETag");
         return $this;
     }
 
@@ -204,15 +204,15 @@ class ServiceProvider extends \Phalcon\DI\Injectable
         return $this->corsEnabled;
     }
 
-    public function setErrorDataHandler($function)
+    public function setDataHandler($function)
     {
-        $this->errorDataHandler = $function;
+        $this->dataHandler = $function;
         return $this;
     }
 
-    public function getErrorDataHandler()
+    public function getDataHandler()
     {
-        return $this->errorDataHandler;
+        return $this->dataHandler;
     }
 
 }
