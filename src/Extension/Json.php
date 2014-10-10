@@ -24,7 +24,7 @@ class Json implements \ApiBird\ExtensionInterface
 
     public function toFormat($data)
     {
-        $callback = ($_GET['callback']) ? ($_GET['callback'].'(') : ('');
+        $callback = (isset($_GET['callback']) && !empty($_GET['callback'])) ? ($_GET['callback'].'(') : ('');
         $suffix = (!empty($callback)) ? (');') : ('');
         $data = $callback . json_encode($data, JSON_NUMERIC_CHECK) . $suffix;
         $error = json_last_error();
