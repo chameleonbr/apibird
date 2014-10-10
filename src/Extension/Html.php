@@ -31,9 +31,9 @@ class Html implements \ApiBird\ExtensionInterface
      */
     public function toFormat($data)
     {
-        $output = "<table cellspacing=\"0\" border=\"2\">\n";
+        $output = "<center><table cellspacing=\"0\" border=\"2\" width=\"70%\">\n";
         $output .= $this->show_array($data, 1, 0);
-        $output .= "</table>\n";
+        $output .= "</table></center>\n";
         return $output;
     }
 
