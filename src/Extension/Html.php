@@ -31,9 +31,13 @@ class Html implements \ApiBird\ExtensionInterface
      */
     public function toFormat($data)
     {
-        $output = "<center><table cellspacing=\"0\" border=\"2\" width=\"70%\">\n";
-        $output .= $this->show_array($data, 1, 0);
-        $output .= "</table></center>\n";
+        if (!is_string($data)) {
+            $output = "<center><table cellspacing=\"0\" border=\"2\" width=\"70%\">\n";
+            $output .= $this->show_array($data, 1, 0);
+            $output .= "</table></center>\n";
+        } else {
+            return $data;
+        }
         return $output;
     }
 
@@ -54,7 +58,10 @@ class Html implements \ApiBird\ExtensionInterface
     function show_array($array, $level, $sub)
     {
         $output = '';
-        if (is_array($array) == 1) {          // check if input is an array
+        if (is_object($array)) {
+            $array = get_object_vars($array);
+        }
+        if (is_array($array)) {          // check if input is an array
             foreach ($array as $key_val => $value) {
                 $offset = "";
                 if (is_array($value) == 1) {   // array is multidimensional
@@ -73,8 +80,6 @@ class Html implements \ApiBird\ExtensionInterface
                     $output .= "</tr>\n";
                 }
             } //foreach $array
-        } else {
-            $output = $array;
         }
         return $output;
     }
