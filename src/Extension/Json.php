@@ -24,7 +24,9 @@ class Json implements \ApiBird\ExtensionInterface
 
     public function toFormat($data)
     {
-        $data = json_encode($data, JSON_NUMERIC_CHECK);
+        $callback = ($_GET['callback']) ? ($_GET['callback']) : ('');
+        $suffix = (!empty($callback)) ? (');') : ('');
+        $data = $callback . json_encode($data, JSON_NUMERIC_CHECK) . $suffix;
         $error = json_last_error();
         if (empty($data) && $error != JSON_ERROR_NONE) {
             $di = \Phalcon\DI\FactoryDefault::getDefault();
