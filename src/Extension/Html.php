@@ -73,7 +73,10 @@ class Html implements \ApiBird\ExtensionInterface
                     $output .= "</tr>\n";
                 }
             } //foreach $array
+        } else {
+            $output = $array;
         }
         return $output;
     }
+
 }
