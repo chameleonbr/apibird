@@ -76,7 +76,7 @@ class Html implements \ApiBird\ExtensionInterface
                     }
                     $sub = 0;
                     $output .= $offset . "<td main " . $sub . " width=\"120\">" . $key_val .
-                            "</td><td width=\"120\">" . $value . "</td>";
+                            "</td><td width=\"120\">" . nl2br($value) . "</td>";
                     $output .= "</tr>\n";
                 }
             } //foreach $array
