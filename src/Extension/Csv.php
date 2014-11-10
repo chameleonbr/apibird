@@ -2,7 +2,7 @@
 
 namespace ApiBird\Extension;
 
-class Csv implements \ApiBird\ExtensionInterface
+class Csv extends \Phalcon\DI\Injectable implements \ApiBird\ExtensionInterface
 {
 
     protected static $types = [

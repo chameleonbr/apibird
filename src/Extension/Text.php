@@ -2,7 +2,7 @@
 
 namespace ApiBird\Extension;
 
-class Text implements \ApiBird\ExtensionInterface
+class Text extends \Phalcon\DI\Injectable implements \ApiBird\ExtensionInterface
 {
 
     protected static $types = [

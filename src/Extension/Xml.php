@@ -4,7 +4,7 @@ namespace ApiBird\Extension;
 
 use \LSS\Array2XML;
 
-class Xml implements \ApiBird\ExtensionInterface
+class Xml extends \Phalcon\DI\Injectable implements \ApiBird\ExtensionInterface
 {
 
     protected static $types = [

@@ -2,7 +2,7 @@
 
 namespace ApiBird\Extension;
 
-class Form implements \ApiBird\ExtensionInterface
+class Form extends \Phalcon\DI\Injectable implements \ApiBird\ExtensionInterface
 {
 
     /**

@@ -2,7 +2,7 @@
 
 namespace ApiBird\Extension;
 
-class Html implements \ApiBird\ExtensionInterface
+class Html extends \Phalcon\DI\Injectable implements \ApiBird\ExtensionInterface
 {
 
     /**

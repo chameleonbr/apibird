@@ -2,7 +2,7 @@
 
 namespace ApiBird\Extension;
 
-class Json implements \ApiBird\ExtensionInterface
+class Json extends \Phalcon\DI\Injectable implements \ApiBird\ExtensionInterface
 {
 
     protected static $types = [

@@ -2,7 +2,7 @@
 
 namespace ApiBird\Extension;
 
-class Multipart implements \ApiBird\ExtensionInterface
+class Multipart extends \Phalcon\DI\Injectable implements \ApiBird\ExtensionInterface
 {
 
     /**
