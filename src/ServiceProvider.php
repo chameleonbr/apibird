@@ -73,9 +73,7 @@ class ServiceProvider extends \Phalcon\DI\Injectable
         if (empty($fileType) && !empty($defaultType)) {
             return $this->getDI()->get($this->base . $defaultType);
         } else if (!empty($fileType) && isset($this->extensions[$fileType])) {
-            if (!empty($acceptedFileTypes) && in_array($this->extensions[$fileType], $acceptedFileTypes)) {
-                return $this->getDI()->get($this->base . $this->extensions[$fileType]);
-            }
+            return $this->getDI()->get($this->base . $this->extensions[$fileType]);
         }
         return false;
     }
@@ -91,9 +89,7 @@ class ServiceProvider extends \Phalcon\DI\Injectable
         if (empty($fileType) && !empty($defaultType)) {
             return $defaultType;
         } else if (!empty($fileType) && isset($this->extensions[$fileType])) {
-            if (!empty($acceptedFileTypes) && in_array($this->extensions[$fileType], $acceptedFileTypes)) {
-                return $this->extensions[$fileType];
-            }
+            return $this->extensions[$fileType];
         }
         return false;
     }

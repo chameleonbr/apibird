@@ -25,9 +25,20 @@ class Response extends \Phalcon\Http\Response
         $this->setStatusCode($statusCode, $statusText);
 
         $handler = $di['apibird']->getResponseExtension($ext);
+
         if (empty($handler)) {
             $handler = $di['apibird']->getDefaultProducesExtension();
         }
+
+        if (is_callable($data)) {
+            $typeName = $di['apibird']->getExtensionHandlerName($ext);
+            if ($typeName) {
+                $data = $data($typeName);
+            } else {
+                $data = $data();
+            }
+        }
+
         if (is_object($data)) {
             $data = get_object_vars($data);
         }
@@ -36,7 +47,7 @@ class Response extends \Phalcon\Http\Response
         if (is_callable($fn)) {
             $data = $fn($data, $statusCode, $statusText);
         }
-        
+
         $this->setHeader('Content-Type', $ext);
 
         if (!empty($data)) {
