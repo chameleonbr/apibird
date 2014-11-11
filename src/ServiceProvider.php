@@ -67,7 +67,6 @@ class ServiceProvider extends \Phalcon\DI\Injectable
      * @param string $fileType
      * @param array $acceptedFileTypes
      * @return \ApiBird\ExtensionInterface
-     * @throws \ApiBird\InvalidTypeException
      */
     public function getExtension($fileType = '', $acceptedFileTypes = [], $defaultType = '')
     {
@@ -76,10 +75,27 @@ class ServiceProvider extends \Phalcon\DI\Injectable
         } else if (!empty($fileType) && isset($this->extensions[$fileType])) {
             if (!empty($acceptedFileTypes) && in_array($this->extensions[$fileType], $acceptedFileTypes)) {
                 return $this->getDI()->get($this->base . $this->extensions[$fileType]);
-            } else {
-                return $this->getDI()->get($this->base . $this->extensions[$fileType]);
             }
         }
+        return false;
+    }
+
+    /**
+     * 
+     * @param string $fileType
+     * @param array $acceptedFileTypes
+     * @return string
+     */
+    public function getExtensionHandlerName($fileType = '', $acceptedFileTypes = [], $defaultType = '')
+    {
+        if (empty($fileType) && !empty($defaultType)) {
+            return $defaultType;
+        } else if (!empty($fileType) && isset($this->extensions[$fileType])) {
+            if (!empty($acceptedFileTypes) && in_array($this->extensions[$fileType], $acceptedFileTypes)) {
+                return $this->extensions[$fileType];
+            }
+        }
+        return false;
     }
 
     /**
