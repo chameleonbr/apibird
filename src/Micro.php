@@ -97,13 +97,17 @@ class Micro extends \Phalcon\Mvc\Micro
     protected function getDataCache($dataReceived, $hash, $function, $limit, $realLimit = 86400)
     {
         $di = $this->getDI();
-        $dataCache = $di['cache']->get($hash);
+        $dataCache = $di[$this->options['cacheService']]->get($hash);
         if (!empty($dataCache) && time() >= $dataCache['expires']) {
             try {
                 $dataReturn = $function($dataReceived);
-                $di['cache']->save($hash, ['data' => $dataReturn, 'expires' => time() + $limit], $realLimit);
+                $di[$this->options['cacheService']]->save($hash, ['data' => $dataReturn, 'expires' => time() + $limit], $realLimit);
             } catch (\Exception $e) {
-                $dataReturn = $dataCache['data'];
+                if ($e->getCode() >= 500) {
+                    $dataReturn = $dataCache['data'];
+                } else {
+                    throw $e;
+                }
             }
         } elseif (empty($dataCache)) {
             $this->response->internalServerError();
