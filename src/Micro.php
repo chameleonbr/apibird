@@ -97,23 +97,26 @@ class Micro extends \Phalcon\Mvc\Micro
     protected function getDataCache($dataReceived, $hash, $function, $limit, $realLimit = 86400)
     {
         $di = $this->getDI();
-        $dataCache = $di[$this->options['cacheService']]->get($hash);
-        if (!empty($dataCache) && time() >= $dataCache['expires']) {
+        $dataCache = $di[$this->options['cacheService']]->get('APIBIRD:' . $hash);
+
+        if (empty($dataCache)) {
             try {
                 $dataReturn = $function($dataReceived);
-                $di[$this->options['cacheService']]->save($hash, ['data' => $dataReturn, 'expires' => time() + $limit], $realLimit);
+                $di[$this->options['cacheService']]->save('APIBIRD:' . $hash, ['data' => $dataReturn, 'expires' => time() + $limit], $realLimit);
             } catch (\Exception $e) {
-                if ($e->getCode() >= 500) {
-                    $dataReturn = $dataCache['data'];
-                } else {
-                    throw $e;
-                }
+                throw $e;
             }
-        } elseif (empty($dataCache)) {
-            $this->response->internalServerError();
-            exit();
-        } else {
+        } elseif (!empty($dataCache) && (isset($dataCache['expires']) && time() >= $dataCache['expires'])) {
+            try {
+                $dataReturn = $function($dataReceived);
+                $di[$this->options['cacheService']]->save('APIBIRD:' . $hash, ['data' => $dataReturn, 'expires' => time() + $limit], $realLimit);
+            } catch (\Exception $e) {
+                $dataReturn = $dataCache['data'];
+            }
+        } elseif (isset($dataCache['expires']) && time() < $dataCache['expires']) {
             $dataReturn = $dataCache['data'];
+        } else {
+            throw new \Exception('Bad Gateway', 502);
         }
 
         return $dataReturn;
