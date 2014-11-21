@@ -140,7 +140,7 @@ class Micro extends \Phalcon\Mvc\Micro
     {
         $method = $_SERVER['REQUEST_METHOD'];
         $path = $this->getRouter()->getRewriteUri();
-        $hash = md5($method . $path . json_encode($data));
+        $hash = md5($method .'&'. $path .'&'. json_encode($data));
         return $hash;
     }
 

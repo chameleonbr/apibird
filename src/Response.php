@@ -21,7 +21,7 @@ class Response extends \Phalcon\Http\Response
             mb_convert_variables($charset, 'utf-8', $data);
         }
 
-        $this->setHeaders($headers);
+        
         $this->setStatusCode($statusCode, $statusText);
 
         $handler = $di['apibird']->getResponseExtension($ext);
@@ -47,9 +47,9 @@ class Response extends \Phalcon\Http\Response
         if (is_callable($fn)) {
             $data = $fn($data, $statusCode, $statusText);
         }
-
         $this->setHeader('Content-Type', $ext);
-
+        
+        $this->setHeaders($headers);    
         if (!empty($data)) {
             $this->setContent($handler->toFormat($data));
         }
