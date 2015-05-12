@@ -62,7 +62,7 @@ class Response extends \Phalcon\Http\Response
         return $this;
     }
 
-    public function setHeaders($headers)
+    public function setHeaders(Phalcon\Http\Response\HeadersInterface $headers)
     {
         if (!empty($headers) && is_array($headers)) {
             foreach ($headers as $name => $value) {

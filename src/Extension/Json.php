@@ -26,7 +26,7 @@ class Json extends \Phalcon\DI\Injectable implements \ApiBird\ExtensionInterface
     {
         $callback = (isset($_GET['callback']) && !empty($_GET['callback'])) ? ($_GET['callback'].'(') : ('');
         $suffix = (!empty($callback)) ? (');') : ('');
-        $data = $callback . json_encode($data, JSON_NUMERIC_CHECK) . $suffix;
+        $data = $callback . json_encode($data) . $suffix;
         $error = json_last_error();
         if (empty($data) && $error != JSON_ERROR_NONE) {
             $di = \Phalcon\DI\FactoryDefault::getDefault();
