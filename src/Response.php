@@ -49,7 +49,13 @@ class Response extends \Phalcon\Http\Response
         }
         $this->setHeader('Content-Type', $ext);
 
-        $this->setHeaders($headers);
+        if (is_array($headers)) {
+            foreach ($headers as $key => $value) {
+                $this->setHeader($key, $value);
+            }
+        } else {
+            $this->setHeaders($headers);
+        }
         $this->setContent($handler->toFormat($data));
         return $this->sendHeaders()->send()->exitOnError($statusCode);
     }
