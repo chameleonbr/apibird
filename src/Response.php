@@ -67,18 +67,6 @@ class Response extends \Phalcon\Http\Response
         }
         return $this;
     }
-
-    public function setHeaders(Phalcon\Http\Response\HeadersInterface $headers)
-    {
-        if (!empty($headers) && is_array($headers)) {
-            foreach ($headers as $name => $value) {
-                $this->setHeader($name, $value);
-            }
-        } elseif (!empty($headers)) {
-            parent::setHeaders($headers);
-        }
-    }
-
     /**
      * Return data with HTTP status 200
      * @param mixed $data
