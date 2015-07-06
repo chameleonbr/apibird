@@ -56,7 +56,11 @@ class Response extends \Phalcon\Http\Response
         } else {
             $this->setHeaders($headers);
         }
-        $this->setContent($handler->toFormat($data));
+        if (is_scalar($data)) {
+            $this->setContent($data);
+        } else {
+            $this->setContent($handler->toFormat($data));
+        }
         return $this->sendHeaders()->send()->exitOnError($statusCode);
     }
 
@@ -67,6 +71,7 @@ class Response extends \Phalcon\Http\Response
         }
         return $this;
     }
+
     /**
      * Return data with HTTP status 200
      * @param mixed $data
