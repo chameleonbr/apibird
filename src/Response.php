@@ -61,7 +61,7 @@ class Response extends \Phalcon\Http\Response
         } else {
             $this->setContent($handler->toFormat($data));
         }
-        return $this->sendHeaders()->send()->exitOnError($statusCode);
+        $this->sendHeaders()->send()->exitOnError($statusCode);
     }
 
     public function exitOnError($status = 200)
@@ -80,7 +80,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function ok($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 200, 'OK');
+        $this->sendResponse($data, $headers, 200, 'OK');
     }
 
     /**
@@ -91,7 +91,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function created($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 201, 'Created');
+        $this->sendResponse($data, $headers, 201, 'Created');
     }
 
     /**
@@ -102,7 +102,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function accepted($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 202, 'Accepted');
+        $this->sendResponse($data, $headers, 202, 'Accepted');
     }
 
     /**
@@ -113,7 +113,7 @@ class Response extends \Phalcon\Http\Response
     public function noContent($headers = [])
     {
         //var_dump($headers);
-        return $this->sendResponse(null, $headers, 204, 'No Content');
+        $this->sendResponse(null, $headers, 204, 'No Content');
     }
 
     /**
@@ -124,7 +124,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function partialContent($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 206, 'Partial Content');
+        $this->sendResponse($data, $headers, 206, 'Partial Content');
     }
 
     /**
@@ -135,7 +135,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function badRequest($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 400, 'Bad Request');
+        $this->sendResponse($data, $headers, 400, 'Bad Request');
     }
 
     /**
@@ -146,7 +146,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function unauthorized($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 401, 'Unauthorized');
+        $this->sendResponse($data, $headers, 401, 'Unauthorized');
     }
 
     /**
@@ -157,7 +157,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function paymentRequired($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 402, 'Payment Required');
+        $this->sendResponse($data, $headers, 402, 'Payment Required');
     }
 
     /**
@@ -168,7 +168,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function forbidden($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 403, 'Forbidden');
+        $this->sendResponse($data, $headers, 403, 'Forbidden');
     }
 
     /**
@@ -179,7 +179,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function notFound($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 404, 'Not Found');
+        $this->sendResponse($data, $headers, 404, 'Not Found');
     }
 
     /**
@@ -190,7 +190,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function methodNotAllowed($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 405, 'Method not Allowed');
+        $this->sendResponse($data, $headers, 405, 'Method not Allowed');
     }
 
     /**
@@ -201,7 +201,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function notAcceptable($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 406, 'Not Acceptable');
+        $this->sendResponse($data, $headers, 406, 'Not Acceptable');
     }
 
     /**
@@ -212,7 +212,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function conflict($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 409, 'Conflict');
+        $this->sendResponse($data, $headers, 409, 'Conflict');
     }
 
     /**
@@ -223,7 +223,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function lengthRequired($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 411, 'Length Required');
+        $this->sendResponse($data, $headers, 411, 'Length Required');
     }
 
     /**
@@ -234,7 +234,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function preconditionFailed($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 412, 'Precondition Failed');
+        $this->sendResponse($data, $headers, 412, 'Precondition Failed');
     }
 
     /**
@@ -245,7 +245,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function requestEntityTooLarge($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 413, 'Request Entity Too Large');
+        $this->sendResponse($data, $headers, 413, 'Request Entity Too Large');
     }
 
     /**
@@ -256,7 +256,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function unsupportedMediaType($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 415, 'Unsupported Media Type');
+        $this->sendResponse($data, $headers, 415, 'Unsupported Media Type');
     }
 
     /**
@@ -267,7 +267,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function tooManyRequests($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 429, 'Too Many Requests');
+        $this->sendResponse($data, $headers, 429, 'Too Many Requests');
     }
 
     /**
@@ -278,7 +278,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function internalServerError($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 500, 'Internal Server Error');
+        $this->sendResponse($data, $headers, 500, 'Internal Server Error');
     }
 
     /**
@@ -289,7 +289,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function notImplemented($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 501, 'Not Implemented');
+        $this->sendResponse($data, $headers, 501, 'Not Implemented');
     }
 
     /**
@@ -300,7 +300,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function badGateway($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 502, 'Bad Gateway');
+        $this->sendResponse($data, $headers, 502, 'Bad Gateway');
     }
 
     /**
@@ -311,7 +311,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function serviceUnavailable($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 503, 'Service Unavailable');
+        $this->sendResponse($data, $headers, 503, 'Service Unavailable');
     }
 
     /**
@@ -322,7 +322,7 @@ class Response extends \Phalcon\Http\Response
      */
     public function gatewayTimeout($data = [], $headers = [])
     {
-        return $this->sendResponse($data, $headers, 504, 'Gateway Timeout');
+        $this->sendResponse($data, $headers, 504, 'Gateway Timeout');
     }
 
 }
